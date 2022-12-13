@@ -6,12 +6,15 @@ This is useful in testing runtime environments, shims, and filter mode drivers.
 The app currently has a set of 6 built in API calls:
 | Type Number | API | Purpose |
 | ----------- | --- | ------- |
-| 1 | std::system::filesystem::exists() | Test if a file exists |
-| 2 | GetFileAttributes() | Test for existance and return file/directory attributes |
-| 3 | CreateFile() | Test 3 tests for read-only access to the file, and to only open existing files |
-| 4 | CreateFile() | Test 4 tests for read-write access, and only existing files |
-| 5 | DeleteFile() | Test if we can delete a file. |
-| 6 | FindXXFile() | Uses FindFirstFile() and FindNextFile() to enumerate files under the named folder |
+| 1 | std::system::filesystem::exists() | Test if a file exists. |
+| 2 | GetFileAttributes() | Test for existance and return file/directory attributes. |
+| 3 | CreateFile() | Test 3 tests for CreateFile for Read Only of only an Existing File; without reading contents. |
+| 4 | CreateFile() | Test 4 tests for CreateFile for Read/Write of only an Existing File; without writing contents. |
+| 5 | DeleteFile() | Test 5 test if we can delete a file. |
+| 6 | FindXXFile() | Test 6 uses FindFirstFile() and FindNextFile() to enumerate files under the named folder. |
+| 7 | CreateFile() | Test 7 tests for CreateFile for Read/Write of only an New File; with writing small content. |
+| 8 | CreateFile() | Test 8 tests for CreateFile for Read Only of only an Existing File; with reading contents. |
+| 9 | LoadLibraryEx() | Test 9 tests for LoadLibraryEx against named dll.  |
 
 The code is easily modified in Tester.cpp to add additional test cases.
 
