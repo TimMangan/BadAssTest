@@ -83,6 +83,18 @@ int main()
     g_packageRoot = current_package_path();
     g_packageWritableRoot = known_folder(FOLDERID_LocalAppData)  / std::filesystem::path(L"Packages") / current_package_family_name() / L"LocalCache\\Local\\Microsoft\\WritablePackageRoot";
 
+
+    wchar_t nop_buffer[512];
+    ULONG len;
+    BOOL BRet = GetAppContainerNamedObjectPath(NULL, NULL, 512, nop_buffer, &len);
+    if (BRet)
+    {
+        std::wcout << L"ContainerNamedObjectPath = ";
+        std::wcout << nop_buffer;
+        std::wcout << L"\n";
+    }
+
+
     // Read in configuration file and process line by line
     std::wstring ConfigFile = path.substr(0, path.find_last_of(L'\\'));
     ConfigFile.append(L"\\BadAssTest.txt");

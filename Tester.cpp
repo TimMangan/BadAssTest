@@ -1,7 +1,7 @@
 // Copyright 2022 TMurgent Technologies, LLP
 // Free for any use.
 
-#define NUMTESTS 6
+#define NUMTESTS 9
 
 #include <Windows.h>
 #include <iostream>
@@ -156,7 +156,9 @@ bool Tester(std::wstring testLine)
         bool Btresult;
         DWORD Dtresult;
         HANDLE Htresult;
+        HMODULE HMtresult;
         std::wstring search;
+        std::string contents = "New File Stuff.";
 
         for (int counter = 0; counter < NUMTESTS; counter++)
         {
@@ -287,6 +289,86 @@ bool Tester(std::wstring testLine)
                         std::wcout << "\tFind Error\n";
                     }
                     RegSetValueExW(hKey, L"TestResult", 0, REG_DWORD, (BYTE*)&Dtresult, sizeof(DWORD));
+                    break;
+                case 7:
+                    Htresult = CreateFileW(FileString.c_str(), GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, CREATE_NEW, 0, NULL);
+                    Sleep(50);
+                    if (Htresult != INVALID_HANDLE_VALUE)
+                    {
+                        std::wcout << L"CreateFile(Write): SUCCESS\n";
+                        DWORD  rLen;
+                        Btresult = WriteFile(Htresult, contents.c_str(), (DWORD)contents.size(), &rLen, NULL);
+                        Sleep(50);
+                        if (Btresult)
+                        {
+                            std::wcout << L"WriteFile(): SUCCESS\n";
+                            CloseHandle(Htresult);
+                        }
+                        else
+                        {
+                            std::wcout << L"WriteFile(): FAIL=0x\n";
+                            _itow_s(GetLastError(), TestString, 32, 16);
+                            std::wcout << TestString;
+                            std::wcout << L"\n";
+                            CloseHandle(Htresult);
+                            Htresult = 0; // indicate write error in TestResult
+                        }
+                    }
+                    else
+                    {
+                        std::wcout << L"CreateFile(Write): FAIL=0x";
+                        _itow_s(GetLastError(), TestString, 32, 16);
+                        std::wcout << TestString;
+                        std::wcout << L"\n";
+                    }
+                    RegSetValueExW(hKey, L"TestResult", 0, REG_DWORD, (BYTE*)&Htresult, sizeof(Htresult));
+                    break;
+                case 8:
+                    Htresult = CreateFileW(FileString.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
+                    Sleep(200);
+                    if (Htresult != INVALID_HANDLE_VALUE)
+                    {
+                        std::wcout << L"CreateFile(Read): SUCCESS\n";
+                        char buff[1024];
+                        DWORD dlen;
+                        Btresult = ReadFile(Htresult, (LPVOID)buff, 1024, &dlen, NULL);
+                        if (Btresult)
+                        {
+                            std::cout << "READ: ";
+                            std::cout << buff;
+                            std::cout << "\n";
+                        }
+                        else
+                        {
+                            std::wcout << L"ReadFile: Failure\n";
+                        }
+                        CloseHandle(Htresult);
+                    }
+                    else
+                    {
+                        std::wcout << L"CreateFile(Read): FAIL=0x";
+                        _itow_s(GetLastError(), TestString, 32, 16);
+                        std::wcout << TestString;
+                        std::wcout << L"\n";
+                    }
+                    RegSetValueExW(hKey, L"TestResult", 0, REG_DWORD, (BYTE*)&Htresult, sizeof(Htresult));
+                    break;
+                case 9:
+                    HMtresult = LoadLibraryExW(FileString.c_str(), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE);
+                    if (HMtresult != NULL)
+                    {
+                        std::wcout << L"LoadLibraryEx: SUCCESS\n";
+                        RegSetValueExW(hKey, L"TestResult", 0, REG_DWORD, (BYTE*)&HMtresult, sizeof(HMtresult));
+                        RegSetValueExW(hKey, L"TestResult", 0, REG_DWORD, (BYTE*)&HMtresult, sizeof(HMtresult));
+                        FreeLibrary(HMtresult);
+                    }
+                    else
+                    {
+                        std::wcout << L"LoadLibraryEx: FAIL=0x";
+                        _itow_s(GetLastError(), TestString, 32, 16);
+                        std::wcout << L"\n";
+                        RegSetValueExW(hKey, L"TestResult", 0, REG_DWORD, (BYTE*)&HMtresult, sizeof(HMtresult));
+                    }
                     break;
                 default:
                     break;
